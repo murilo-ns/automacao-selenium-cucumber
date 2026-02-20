@@ -1,4 +1,4 @@
-name: CI - Testes Automatizados
+name: CI - Testes Automatizados Selenium Java
 
 on:
   push:
