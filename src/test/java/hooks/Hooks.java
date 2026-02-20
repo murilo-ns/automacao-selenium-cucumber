@@ -9,14 +9,13 @@ import runner.RunBase;
 
 public class Hooks {
 
-    private WebDriver driver;
-
     public static String usuarioCriado;
     public static String senhaCriada;
 
     @Before("@login")
     public void criarUsuarioValido() {
-        driver = RunBase.getDriver();
+
+        WebDriver driver = RunBase.getDriver();
 
         HomePage homePage = new HomePage(driver);
         CadastroPage cadastroPage = new CadastroPage(driver);

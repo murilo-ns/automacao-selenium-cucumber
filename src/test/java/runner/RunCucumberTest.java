@@ -9,10 +9,12 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         features = "src/test/resources/features",
-        glue = {"steps"},
-        plugin = {"pretty"}
+        glue = {"steps", "hooks"},
+        plugin = {
+                "pretty",
+                "html:target/cucumber-report.html"
+        }
 )
-
 public class RunCucumberTest extends RunBase {
 
     @BeforeClass

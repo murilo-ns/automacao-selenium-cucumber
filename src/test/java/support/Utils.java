@@ -1,9 +1,6 @@
 package support;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import pages.BasePage;
@@ -19,9 +16,13 @@ public class Utils extends BasePage {
         super(driver);
     }
 
+    private WebDriverWait getWait(int tempo) {
+        return new WebDriverWait(driver, Duration.ofSeconds(tempo));
+    }
+
     public WebElement esperarElementoClicavel(By elemento, int tempo) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(tempo));
-        return wait.until(ExpectedConditions.elementToBeClickable(elemento));
+        return getWait(tempo)
+                .until(ExpectedConditions.elementToBeClickable(elemento));
     }
 
     public WebElement esperarElementoClicavel(By elemento) {
@@ -29,8 +30,8 @@ public class Utils extends BasePage {
     }
 
     public WebElement esperarElementoVisivel(By elemento, int tempo) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(tempo));
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(elemento));
+        return getWait(tempo)
+                .until(ExpectedConditions.visibilityOfElementLocated(elemento));
     }
 
     public WebElement esperarElementoVisivel(By elemento) {
@@ -39,27 +40,25 @@ public class Utils extends BasePage {
 
     public void clicarNoElemento(By elemento) {
         WebElement el = esperarElementoClicavel(elemento);
+
         try {
             el.click();
-        } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", el);
+        } catch (ElementClickInterceptedException e) {
+            ((JavascriptExecutor) driver)
+                    .executeScript("arguments[0].click();", el);
         }
     }
 
     public void preencherCampo(By elemento, String conteudo) {
-        WebElement campo = esperarElementoClicavel(elemento);
+        WebElement campo = esperarElementoVisivel(elemento);
         campo.clear();
         campo.sendKeys(conteudo);
     }
 
     protected String extrairTexto(By elemento) {
-        try {
-            WebElement el = esperarElementoVisivel(elemento);
-            String texto = el.getText();
-            return texto == null ? "" : texto.trim();
-        } catch (Exception e) {
-            return "";
-        }
+        WebElement el = esperarElementoVisivel(elemento);
+        String texto = el.getText();
+        return texto == null ? "" : texto.trim();
     }
 
     public boolean validarTextoIndicativoDaTela(By elemento, String textoEsperado) {
@@ -73,13 +72,12 @@ public class Utils extends BasePage {
     }
 
     public String gerarEmailAleatorio() {
-        String emailInicio = "usuario_teste";
-        String emailFim = "@teste.com.br";
-        int numero = new Random().nextInt(9_999_999);
-        return emailInicio + numero + emailFim;
+        return "usuario_teste" + UUID.randomUUID().toString().substring(0,8)
+                + "@teste.com.br";
     }
 
     public String gerarSenhaAleatoria() {
+
         String letrasMaiusculas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String letrasMinusculas = "abcdefghijklmnopqrstuvwxyz";
         String numeros = "0123456789";
@@ -94,13 +92,17 @@ public class Utils extends BasePage {
         caracteres.add(especiais.charAt(random.nextInt(especiais.length())));
 
         String todos = letrasMaiusculas + letrasMinusculas + numeros + especiais;
+
         while (caracteres.size() < 8) {
             caracteres.add(todos.charAt(random.nextInt(todos.length())));
         }
 
         Collections.shuffle(caracteres);
+
         StringBuilder senha = new StringBuilder();
-        for (char c : caracteres) senha.append(c);
+        for (char c : caracteres) {
+            senha.append(c);
+        }
 
         return senha.toString();
     }
